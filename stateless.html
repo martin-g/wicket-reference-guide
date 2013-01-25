@@ -59,34 +59,122 @@
             
   <div class="section" id="stateless-pages">
 <h1>Stateless pages<a class="headerlink" href="#stateless-pages" title="Permalink to this headline">¶</a></h1>
-<p>By nature a page is stateless, i.e. a new instance is created for each request and discarded at the end. A page becomes stateful as soon as a stateful behavior or component is added in the tree.</p>
-<p>A Component <a class="footnote-reference" href="#id3" id="id1">[1]</a> declares that it needs to be stateful by returning <em>false</em> in #getStatelessHint() method:</p>
+<div class="section" id="being-stateful">
+<h2>Being stateful<a class="headerlink" href="#being-stateful" title="Permalink to this headline">¶</a></h2>
+<p>By nature a page is stateless, i.e. a new instance is created for each request and discarded at the end. A page becomes stateful as soon as a stateful behavior or component is added in the tree. Stateful pages are stored in a storage for later use, i.e. in following requests the same page instance is reused instead of creating a new instance. Technically, the page may be deserialized so it is not always the same JVM instance but the important thing is that any state/data in the page will be preserved.</p>
+<p>A <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/Component.html">Component</a> declares that it needs to be stateful by returning <em>false</em> in #getStatelessHint() method:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">getStatelessHint</span><span class="o">()</span>
 <span class="o">{</span>
     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>and Behavior <a class="footnote-reference" href="#id4" id="id2">[2]</a> by overriding:</p>
+<p>and <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/Behavior.html">Behavior</a> by overriding:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">getStatelessHint</span><span class="o">(</span><span class="n">Component</span> <span class="n">component</span><span class="o">)</span>
 <span class="o">{</span>
     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>and org.apache.wicket.Behavior can be marked as stateful by overriding their</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>org.apache.wicket.Component</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>org.apache.wicket.Behavior</td></tr>
-</tbody>
-</table>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">wicket</span><span class="o">.</span><span class="na">reference</span><span class="o">.</span><span class="na">stateless</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.wicket.markup.html.WebPage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.wicket.markup.html.link.Link</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatefulPage</span> <span class="kd">extends</span> <span class="n">WebPage</span>
+<span class="o">{</span>
+	<span class="kd">private</span> <span class="kt">int</span> <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="nf">StatefulPage</span><span class="o">()</span>
+	<span class="o">{</span>
+		<span class="n">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Link</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;(</span><span class="s">&quot;link&quot;</span><span class="o">)</span> <span class="o">{</span>
+
+			<span class="nd">@Override</span>
+			<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">()</span>
+			<span class="o">{</span>
+				<span class="n">counter</span><span class="o">++;</span>
+			<span class="o">}</span>
+		<span class="o">});</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCounter</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="n">counter</span><span class="o">;</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Click on an <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/markup/html/link/Link.html">Link</a> will lead to a request that will try to find the Page object that contains this link, then find the link itself in that page and finally execute its <cite>#onClick()</cite> method. The value of <em>counter</em> field will increment for each click on the link.</p>
+<p>If <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/markup/html/link/StatelessLink.html">StatelessLink</a> is used instead:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">wicket</span><span class="o">.</span><span class="na">reference</span><span class="o">.</span><span class="na">stateless</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.wicket.markup.html.WebPage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.wicket.markup.html.link.StatelessLink</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatelessPage</span> <span class="kd">extends</span> <span class="n">WebPage</span>
+<span class="o">{</span>
+	<span class="kd">private</span> <span class="kt">int</span> <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="nf">StatelessPage</span><span class="o">()</span>
+	<span class="o">{</span>
+		<span class="n">add</span><span class="o">(</span><span class="k">new</span> <span class="n">StatelessLink</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;(</span><span class="s">&quot;link&quot;</span><span class="o">)</span> <span class="o">{</span>
+
+			<span class="nd">@Override</span>
+			<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">()</span>
+			<span class="o">{</span>
+				<span class="n">counter</span><span class="o">++;</span>
+			<span class="o">}</span>
+		<span class="o">});</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCounter</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="n">counter</span><span class="o">;</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>then the value of <em>counter</em> field will always be <em>0</em> because a new instance of StatelessPage is created for each click on the link.</p>
+</div>
+<div class="section" id="keeping-it-stateless">
+<h2>Keeping it stateless<a class="headerlink" href="#keeping-it-stateless" title="Permalink to this headline">¶</a></h2>
+<p>To make sure that a page is stateless and there is no stateful component/behavior added to it by accident <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/devutils/stateless/StatelessChecker.html">StatelessChecker</a> can be used. If there is a stateful component or behavior then this checker will throw an exception which message explains where is the problem.</p>
+<ol class="arabic simple">
+<li>Add dependency to <cite>wicket-devutils</cite></li>
+</ol>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">wicket</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">wicket</span><span class="o">-</span><span class="n">devutils</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="n">$</span><span class="o">{</span><span class="n">wicket</span><span class="o">.</span><span class="na">version</span><span class="o">}&lt;</span><span class="n">version</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li>Register StatelessChecker</li>
+</ol>
+<p>Register StatelessChecker as a listener that is invoked before rendering the page:</p>
+<p><strong>MyApplication.java</strong></p>
+<div class="highlight-java"><div class="highlight"><pre>	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span>
+	<span class="o">{</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">init</span><span class="o">();</span>
+
+		<span class="n">getComponentPreOnBeforeRenderListeners</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">wicket</span><span class="o">.</span><span class="na">devutils</span><span class="o">.</span><span class="na">stateless</span><span class="o">.</span><span class="na">StatelessChecker</span><span class="o">());</span>
+	<span class="o">}</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li>Annotate the pages</li>
+</ol>
+<p>Use <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/devutils/stateless/StatelessComponent.html">StatelessComponent</a> annotation to require the page to be stateless.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nd">@org.apache.wicket.devutils.stateless.StatelessComponent</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CheckedPage</span> <span class="kd">extends</span> <span class="n">WebPage</span>
+<span class="o">{</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -95,6 +183,16 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Stateless pages</a><ul>
+<li><a class="reference internal" href="#being-stateful">Being stateful</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#keeping-it-stateless">Keeping it stateless</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="ajax.html"
                         title="previous chapter">Ajax</a></p>
@@ -135,7 +233,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, ASF.
-      Last updated on Jan 24, 2013.
+      Last updated on Jan 25, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
