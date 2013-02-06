@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Native WebSocket &mdash; Apache Wicket 6 documentation</title>
+    <title>Wicket Native WebSockets &mdash; Apache Wicket 6 documentation</title>
     
     <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -57,8 +57,69 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="native-websocket">
-<h1>Native WebSocket<a class="headerlink" href="#native-websocket" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="wicket-native-websockets">
+<h1>Wicket Native WebSockets<a class="headerlink" href="#wicket-native-websockets" title="Permalink to this headline">¶</a></h1>
+<p>Since version 6.0 Wicket provides an experimental module that provides integration with WebSocket support in the web containers like Jetty and Apache Tomcat.</p>
+<p>Each of the integrations provide a custom implementation of <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/protocol/http/WicketFilter.html">WicketFilter</a> that first checks whether the current web request needs to upgrade its protocol from HTTP to WebSocket. This is done by checking the request headers for the special header with name &#8220;Upgrade&#8221;. If the request is an upgrade then the filter registers an endpoint for the web socket connection. Later this endpoint is used to read/write messages from/to the client.</p>
+<p>When a client is connected it is being registered in a global (application scoped) registry using as a key the application, the client session id and the id of the page that registered it. Later when the server needs to push a message it uses this registry to filter which clients need to receive the message.
+When a message is received from the client Wicket uses the associated page id for the web connection and loads the Wicket Page as Ajax requests do, then it broadcasts an <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/protocol/ws/api/message/IWebSocketMessage.html">IWebSocketMessage</a> (:ref:Wicket 1.5 Event system) to all its components and behaviors so they can react on it.
+The server-side can push plain text and binary messages to the client - pure web socket messages, but can also add components for re-render, prepend/append JavaScript as you do with AjaxRequestTarget.</p>
+<p>h3. How to use it ?</p>
+<p>h5. Maven dependency</p>
+<p>Add dependency to either org.apache.wicket:wicket-native-websocket-jetty or org.apache.wicket:wicket-native-websocket-tomcat.</p>
+<p>h5. Custom WicketFilter</p>
+<p>Setup the custom WicketFilter implementation for the chosen web container in your web.xml.</p>
+<dl class="docutils">
+<dt>For Jetty 7.5+ this is</dt>
+<dd>&lt;filter-class&gt;org.apache.wicket.protocol.http.Jetty7WebSocketFilter&lt;/filter-class&gt;</dd>
+<dt>For Tomcat 7.0.27+:</dt>
+<dd>&lt;filter-class&gt;org.apache.wicket.protocol.http.Tomcat7WebSocketFilter&lt;/filter-class&gt;</dd>
+</dl>
+<p>h5. WebSocketBehavior</p>
+<p>_org.apache.wicket.protocol.ws.api.WebSocketBehavior_ is much like Ajax behaviors that you may know from earlier versions of Wicket.
+Add WebSocketBehavior to the page that will use web socket communication:</p>
+<p>MyPage.java</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyPage</span> <span class="kd">extends</span> <span class="n">WebPage</span> <span class="o">{</span>
+
+   <span class="kd">public</span> <span class="nf">MyPage</span><span class="o">()</span> <span class="o">{</span>
+       <span class="n">add</span><span class="o">(</span><span class="k">new</span> <span class="n">WebSocketBehavior</span><span class="o">()</span> <span class="o">{</span>
+           <span class="nd">@Override</span>
+           <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">WebSocketRequestHandler</span> <span class="n">handler</span><span class="o">,</span> <span class="n">TextMessage</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+           <span class="o">}</span>
+       <span class="o">});</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Use _message.getText()_ to read the message sent by the client and use the passed _handler.push(String)_ to push a text message to the connected client. Additionally you can use _handler.add(Component...)_ to add Wicket components for re-render, _handler#prependJavaScript(CharSequence)_ and _handler#appendJavaScript(CharSequence)_ as you do with AjaxRequestTarget.</p>
+<p>See the demo application at [martin-g&#8217;s GitHub|https://github.com/martin-g/wicket-native-websocket-example]. It is written with Scala and uses [Akka|http://akka.io] which are not available at Maven central repository so it cannot be hosted at Apache Git servers.</p>
+<p>h5. Client side APIs</p>
+<p>By adding a _WebSocketBehavior_ to your component(s) Wicket will contribute _wicket-<a href="#id1"><span class="problematic" id="id2">websocket-jquery.js_</span></a> library which provides some helper functions to write your client side code. There is a default websocket connection per Wicket Page opened for you which you can use like _Wicket.WebSocket.send(&#8216;{msg: &#8220;my message&#8221;}&#8217;)_.</p>
+<p>If you need more WebSocket connections then you can do: _var ws = new Wicket.WebSocket(); ws.send(&#8216;message&#8217;);_</p>
+<p>To close a connection: _Wicket.WebSocket.close()_ or _ws.close()_.</p>
+<p>_Wicket.WebSocket_ is a simple wrapper around the native _window.WebSocket_ API which is used to intercept the calls and to fire special events (Wicket.Event PubSub).
+|| Event name || Arguments || Description ||
+| /websocket/open | jqEvent | A WebSocket connection has been just opened |
+| /websocket/message | jqEvent, message | A message has been received from the server |
+| /websocket/closed | jqEvent | A WebSocket connection has been closed |
+| /websocket/error | jqEvent | An error occurred in the communication. The connection will be closed |</p>
+<p>If you don&#8217;t need to listen for these events then you can just use the native JavaScript API (window.WebSocket).</p>
+<p>A demo code can be seen in the [Demo Application|https://github.com/martin-g/wicket-native-websocket-example/blob/master/src/main/resources/org/apache/wicket/websocket/jetty/example/client.js]</p>
+<p>h3. Testing</p>
+<p>The module provides _org.apache.wicket.protocol.ws.util.tester.WebSocketTester_ which gives you the possibility to emulate sending and receiving messages without the need to run in a real web container, as WicketTester does this for HTTP requests.</p>
+<p>Check [WebSocketTesterTest|https://git-wip-us.apache.org/repos/asf/wicket/repo?p=wicket.git;a=blob;f=wicket-experimental/wicket-native-websocket/wicket-native-websocket-core/src/test/java/org/apache/wicket/protocol/ws/util/tester/WebSocketTesterTest.java;hb=master] for an example.</p>
+<p>h3. Differences with Wicket-Atmosphere module.</p>
+<p>Wicket-Atmosphere provides integration with [Atmosphere|https://github.com/Atmosphere/atmosphere/] and let it handle the inconsistencies in WebSocket protocol support in different browsers and web containers. If either the browser or the web container do not support WebSockets then Atmosphere will downgrade (depending on the configuration) to either long-polling, streaming, server-side events, jsonp, ... to simulate the long running connection.</p>
+<p>Wicket Native WebSocket uses only WebSocket connections, so it wont work for browsers and web containers which do not support WebSockets. There are no plans to add such support in future. Use it only if you really know that you will run your application in an environment that supports WebSockets.</p>
+<p>Currently supported web containers are Jetty 7.5+ and Tomcat 7.0.27+.
+Currently supported browsers are Google Chrome/Chromium, Firefox 11+, Safari 5.x (with Jetty), IE10.</p>
+<div class="section" id="faq">
+<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Request and session scoped beans do not work.</li>
+</ol>
+<p>The Web Socket communication is not intercepted by Servlet Filters and Listeners and thus the Dependency Injection libraries have no chance to export the request and session beans.</p>
+</div>
 </div>
 
 
@@ -67,6 +128,14 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Wicket Native WebSockets</a><ul>
+<li><a class="reference internal" href="#faq">FAQ</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="ioc.html"
                         title="previous chapter">Dependency injection</a></p>
@@ -107,7 +176,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, ASF.
-      Last updated on Jan 25, 2013.
+      Last updated on Feb 06, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

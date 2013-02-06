@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Apache Wicket 6 documentation" href="index.html" />
     <link rel="next" title="Dependency injection" href="ioc.html" />
-    <link rel="prev" title="Ajax" href="ajax.html" />
+    <link rel="prev" title="Event system" href="events.html" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -46,7 +46,7 @@
           <a href="ioc.html" title="Dependency injection"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ajax.html" title="Ajax"
+          <a href="events.html" title="Event system"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Apache Wicket 6 documentation</a> &raquo;</li> 
       </ul>
@@ -139,7 +139,7 @@
 </div>
 <div class="section" id="keeping-it-stateless">
 <h2>Keeping it stateless<a class="headerlink" href="#keeping-it-stateless" title="Permalink to this headline">¶</a></h2>
-<p>To make sure that a page is stateless and there is no stateful component/behavior added to it by accident <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/devutils/stateless/StatelessChecker.html">StatelessChecker</a> can be used. If there is a stateful component or behavior then this checker will throw an exception which message explains where is the problem.</p>
+<p>To make sure that a page is stateless and there is no stateful component/behavior added to it by accident <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/devutils/stateless/StatelessChecker.html">StatelessChecker</a> can be used. If there is a stateful component or behavior then this checker will throw an exception with a message explaining where is the problem.</p>
 <ol class="arabic simple">
 <li>Add dependency to <cite>wicket-devutils</cite></li>
 </ol>
@@ -170,8 +170,6 @@
 <p>Use <a class="reference external" href="http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/devutils/stateless/StatelessComponent.html">StatelessComponent</a> annotation to require the page to be stateless.</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="nd">@org.apache.wicket.devutils.stateless.StatelessComponent</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">CheckedPage</span> <span class="kd">extends</span> <span class="n">WebPage</span>
-<span class="o">{</span>
-<span class="o">}</span>
 </pre></div>
 </div>
 </div>
@@ -194,8 +192,8 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="ajax.html"
-                        title="previous chapter">Ajax</a></p>
+  <p class="topless"><a href="events.html"
+                        title="previous chapter">Event system</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="ioc.html"
                         title="next chapter">Dependency injection</a></p>
@@ -226,14 +224,14 @@
           <a href="ioc.html" title="Dependency injection"
              >next</a> |</li>
         <li class="right" >
-          <a href="ajax.html" title="Ajax"
+          <a href="events.html" title="Event system"
              >previous</a> |</li>
         <li><a href="index.html">Apache Wicket 6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, ASF.
-      Last updated on Jan 25, 2013.
+      Last updated on Feb 06, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
