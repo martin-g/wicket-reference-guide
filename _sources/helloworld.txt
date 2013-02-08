@@ -4,7 +4,7 @@ Hello World
    :maxdepth: 3
 
 
-This HelloWorld application demonstrates the basic structure of a web application in Apache Wicket. A ``Label`` [#]_ component is used to display a message on the home page for the application.
+This HelloWorld application demonstrates the basic structure of a web application in Apache Wicket. A `Label <http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/markup/html/basic/Label.html>`_ component is used to display a message on the home page for the application.
 
 In all the Wicket examples, you have to put all files in the same package directory. This means putting the markup files and the java files next to one another. It is possible to alter this behavior, but that is beyond the scope of this example. The only exception is the obligatory web.xml file which should reside in the WEB-INF/ directory of your web application root folder.
 
@@ -13,16 +13,16 @@ If you wish to start building this example, you may want to take a look at the `
 HelloWorldApplication.java
 --------------------------
 
-Each Wicket application is defined by an Application [#]_ object. This object defines what the home page is, and allows for some configuration.
+Each Wicket application is defined by an `Application <http://ci.apache.org/projects/wicket/apidocs/6.0.x/org/apache/wicket/Application.html>`_ object. This object defines what the home page is, and allows for some configuration.
 
-.. includecode:: ../../wicket-examples/src/main/java/org/apache/wicket/examples/helloworld/HelloWorldApplication.java
+.. includecode:: ../../../helloworld/src/main/java/org/apache/wicket/reference/helloworld/HelloWorldApplication.java#docu
 
 Here you can see that we define org.apache.wicket.examples.helloworld.HelloWorld to be our home page. When the base URL (the context root) of our application is requested, the markup rendered by the HelloWorld page is returned.
 
 HelloWorld.java
 ---------------
 
-.. includecode:: ../../wicket-examples/src/main/java/org/apache/wicket/examples/helloworld/HelloWorld.java
+.. includecode:: ../../../helloworld/src/main/java/org/apache/wicket/reference/helloworld/HelloWorld.java#docu
 
 The Label is constructed using two parameters:
 
@@ -37,7 +37,7 @@ HelloWorld.html
 
 The HTML file that defines our Hello World functionality is as follows:
 
-.. includecode:: ../../wicket-examples/src/main/java/org/apache/wicket/examples/helloworld/HelloWorld.html
+.. includecode:: ../../../helloworld/src/main/java/org/apache/wicket/reference/helloworld/HelloWorld.html
 
 In this file, you see two elements that need some attention:
 
@@ -52,17 +52,14 @@ web.xml
 
 In order to deploy our HelloWorld application, we need to make our application known to the application server by means of the web.xml file.
 
-.. includecode:: ../../wicket-examples/src/main/webapp/WEB-INF/web.xml
+.. includecode:: ../../../helloworld/src/main/webapp/WEB-INF/web.xml
 
 In this definition you see the Wicket filter defined, which handles all requests. In order to let Wicket know which application is available, only the applicationClassName filter parameter is needed.
 
-Also, notice the url-mapping to /*. The Wicket filter will only process requests that are Wicket requests. If a request is not Wicket related, the filter will pass the request on to the chain. This ensures that (static) resources outside the realm of the Wicket application, such as style sheets, JavaScript files, images and so forth will be served by the container.
+Also, notice the url-mapping to /\*. The Wicket filter will only process requests that are Wicket requests. If a request is not Wicket related, the filter will pass the request on to the chain. This ensures that (static) resources outside the realm of the Wicket application, such as style sheets, JavaScript files, images and so forth will be served by the container.
 
 Ready to deploy
 
 That’s it. No more configuration necessary! All you need to do now is to deploy the web application into your favorite application server. Point your browser to the url: http://<servername>/<warfilename>/, substituting servername and warfilename to the appropriate values, such as http://localhost:8080/helloworld/.
 
 As you can see: no superfluous XML configuration files are needed to enable a Wicket application. Only the markup (HTML) files, the Java class files and the required web.xml were needed to create this application.
-
-.. [#] org.apache.wicket.markup.html.Label
-.. [#] org.apache.wicket.protocol.http.WebApplication

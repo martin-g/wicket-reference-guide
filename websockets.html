@@ -94,8 +94,10 @@ Add WebSocketBehavior to the page that will use web socket communication:</p>
 <p>Use _message.getText()_ to read the message sent by the client and use the passed _handler.push(String)_ to push a text message to the connected client. Additionally you can use _handler.add(Component...)_ to add Wicket components for re-render, _handler#prependJavaScript(CharSequence)_ and _handler#appendJavaScript(CharSequence)_ as you do with AjaxRequestTarget.</p>
 <p>See the demo application at [martin-g&#8217;s GitHub|https://github.com/martin-g/wicket-native-websocket-example]. It is written with Scala and uses [Akka|http://akka.io] which are not available at Maven central repository so it cannot be hosted at Apache Git servers.</p>
 <p>h5. Client side APIs</p>
-<p>By adding a _WebSocketBehavior_ to your component(s) Wicket will contribute _wicket-<a href="#id1"><span class="problematic" id="id2">websocket-jquery.js_</span></a> library which provides some helper functions to write your client side code. There is a default websocket connection per Wicket Page opened for you which you can use like _Wicket.WebSocket.send(&#8216;{msg: &#8220;my message&#8221;}&#8217;)_.</p>
-<p>If you need more WebSocket connections then you can do: _var ws = new Wicket.WebSocket(); ws.send(&#8216;message&#8217;);_</p>
+<p>By adding a <em>WebSocketBehavior</em> to your component(s) Wicket will contribute <em>wicket-websocket-jquery.js</em> library which provides some helper functions to write your client side code. There is a default websocket connection per Wicket Page opened for you which you can use like _Wicket.WebSocket.send(&#8216;{msg: &#8220;my message&#8221;}&#8217;)_.</p>
+<p>If you need more WebSocket connections then you can do:</p>
+<div class="highlight-java"><pre>var ws = new Wicket.WebSocket(); ws.send('message');</pre>
+</div>
 <p>To close a connection: _Wicket.WebSocket.close()_ or _ws.close()_.</p>
 <p>_Wicket.WebSocket_ is a simple wrapper around the native _window.WebSocket_ API which is used to intercept the calls and to fire special events (Wicket.Event PubSub).
 || Event name || Arguments || Description ||
@@ -176,7 +178,7 @@ Currently supported browsers are Google Chrome/Chromium, Firefox 11+, Safari 5.x
     </div>
     <div class="footer">
         &copy; Copyright 2013, ASF.
-      Last updated on Feb 06, 2013.
+      Last updated on Feb 08, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
